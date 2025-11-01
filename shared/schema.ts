@@ -19,6 +19,7 @@ export const recordings = pgTable("recordings", {
   bulletPoints: text("bullet_points").array(),
   duration: integer("duration").notNull(),
   isPrivate: boolean("is_private").notNull().default(false),
+  isPinned: boolean("is_pinned").notNull().default(false),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
 

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Play, Share2, Trash2, Lock, ChevronDown, ChevronUp } from "lucide-react";
+import { Play, Share2, Trash2, Lock, ChevronDown, ChevronUp, Pin } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 interface RecordingCardProps {
@@ -14,10 +14,12 @@ interface RecordingCardProps {
   bulletPoints?: string[];
   duration: number;
   isPrivate: boolean;
+  isPinned?: boolean;
   createdAt: Date;
   onPlay: (id: string) => void;
   onShare: (id: string) => void;
   onDelete: (id: string) => void;
+  onPin?: (id: string) => void;
 }
 
 export default function RecordingCard({
@@ -29,10 +31,12 @@ export default function RecordingCard({
   bulletPoints,
   duration,
   isPrivate,
+  isPinned = false,
   createdAt,
   onPlay,
   onShare,
   onDelete,
+  onPin,
 }: RecordingCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -47,9 +51,14 @@ export default function RecordingCard({
       <CardHeader className="space-y-2 pb-4">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-semibold truncate">
-              {title || "Untitled Recording"}
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-semibold truncate">
+                {title || "Untitled Recording"}
+              </h3>
+              {isPinned && (
+                <Pin className="w-4 h-4 text-primary fill-primary" />
+              )}
+            </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
               <span>{formatDistanceToNow(createdAt, { addSuffix: true })}</span>
               <span>•</span>
@@ -138,6 +147,16 @@ export default function RecordingCard({
           <Share2 className="w-4 h-4 mr-2" />
           Share
         </Button>
+        {onPin && (
+          <Button
+            variant={isPinned ? "default" : "outline"}
+            size="sm"
+            onClick={() => onPin(id)}
+            data-testid={`button-pin-${id}`}
+          >
+            <Pin className={`w-4 h-4 ${isPinned ? "fill-current" : ""}`} />
+          </Button>
+        )}
         <Button
           variant="outline"
           size="sm"

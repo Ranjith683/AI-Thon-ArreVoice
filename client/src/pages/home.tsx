@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Mic, Plus } from "lucide-react";
 import RecordingModal from "@/components/RecordingModal";
@@ -6,11 +6,13 @@ import RecordingCard from "@/components/RecordingCard";
 import ShareModal from "@/components/ShareModal";
 import StreakWidget from "@/components/StreakWidget";
 import EmptyState from "@/components/EmptyState";
+import TagFilter from "@/components/TagFilter";
 
 export default function Home() {
   const [recordingModalOpen, setRecordingModalOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [selectedRecording, setSelectedRecording] = useState<any>(null);
+  const [selectedTag, setSelectedTag] = useState("all");
   
   const [recordings, setRecordings] = useState([
     {
@@ -28,6 +30,7 @@ export default function Home() {
       ],
       duration: 95,
       isPrivate: false,
+      isPinned: true,
       createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000),
     },
     {
@@ -44,7 +47,25 @@ export default function Home() {
       ],
       duration: 142,
       isPrivate: false,
+      isPinned: false,
       createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
+    },
+    {
+      id: "3",
+      title: "Political thoughts on current events",
+      tags: ["politics"],
+      transcription:
+        "The recent policy changes have really made me think about how government decisions affect everyday people. It's important to stay informed and engaged in the democratic process.",
+      summary: "Reflection on political engagement and civic responsibility.",
+      bulletPoints: [
+        "Policy changes have significant impacts on daily life",
+        "Staying informed is crucial for democracy",
+        "Civic engagement requires active participation",
+      ],
+      duration: 78,
+      isPrivate: false,
+      isPinned: false,
+      createdAt: new Date(Date.now() - 48 * 60 * 60 * 1000),
     },
   ]);
 
@@ -61,6 +82,7 @@ export default function Home() {
       transcription: "Transcription will be processed...",
       summary: "AI summary will be generated...",
       bulletPoints: [],
+      isPinned: false,
       createdAt: new Date(),
     };
     setRecordings([newRecording, ...recordings]);
@@ -79,6 +101,40 @@ export default function Home() {
     setRecordings(recordings.filter((r) => r.id !== id));
     console.log("Recording deleted:", id);
   };
+
+  const handlePin = (id: string) => {
+    setRecordings(
+      recordings.map((r) =>
+        r.id === id ? { ...r, isPinned: !r.isPinned } : r
+      )
+    );
+    console.log("Recording pin toggled:", id);
+  };
+
+  const filteredRecordings = useMemo(() => {
+    if (selectedTag === "all") {
+      return recordings;
+    }
+    return recordings.filter((r) => r.tags.includes(selectedTag));
+  }, [recordings, selectedTag]);
+
+  const pinnedRecordings = useMemo(() => {
+    return filteredRecordings.filter((r) => r.isPinned);
+  }, [filteredRecordings]);
+
+  const unpinnedRecordings = useMemo(() => {
+    return filteredRecordings.filter((r) => !r.isPinned);
+  }, [filteredRecordings]);
+
+  const tagCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    recordings.forEach((recording) => {
+      recording.tags.forEach((tag) => {
+        counts[tag] = (counts[tag] || 0) + 1;
+      });
+    });
+    return counts;
+  }, [recordings]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -102,35 +158,64 @@ export default function Home() {
           </Button>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 space-y-4">
-            <h2 className="text-xl font-heading font-semibold">
-              Recent Recordings
-            </h2>
-            
-            {recordings.length === 0 ? (
-              <EmptyState onNewRecording={() => setRecordingModalOpen(true)} />
-            ) : (
-              <div className="space-y-4">
-                {recordings.map((recording) => (
-                  <RecordingCard
-                    key={recording.id}
-                    {...recording}
-                    onPlay={(id) => console.log("Play:", id)}
-                    onShare={handleShare}
-                    onDelete={handleDelete}
-                  />
-                ))}
-              </div>
-            )}
+        <div className="grid md:grid-cols-4 gap-6">
+          <div className="md:col-span-1">
+            <div className="space-y-6">
+              <TagFilter
+                selectedTag={selectedTag}
+                onTagSelect={setSelectedTag}
+                tagCounts={tagCounts}
+              />
+              <StreakWidget
+                currentStreak={streak.currentStreak}
+                longestStreak={streak.longestStreak}
+                totalRecordings={streak.totalRecordings}
+              />
+            </div>
           </div>
 
-          <div>
-            <StreakWidget
-              currentStreak={streak.currentStreak}
-              longestStreak={streak.longestStreak}
-              totalRecordings={streak.totalRecordings}
-            />
+          <div className="md:col-span-3 space-y-6">
+            {filteredRecordings.length === 0 ? (
+              <EmptyState onNewRecording={() => setRecordingModalOpen(true)} />
+            ) : (
+              <>
+                {pinnedRecordings.length > 0 && (
+                  <div className="space-y-4">
+                    <h2 className="text-xl font-heading font-semibold">
+                      Pinned Recordings
+                    </h2>
+                    {pinnedRecordings.map((recording) => (
+                      <RecordingCard
+                        key={recording.id}
+                        {...recording}
+                        onPlay={(id) => console.log("Play:", id)}
+                        onShare={handleShare}
+                        onDelete={handleDelete}
+                        onPin={handlePin}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {unpinnedRecordings.length > 0 && (
+                  <div className="space-y-4">
+                    <h2 className="text-xl font-heading font-semibold">
+                      {selectedTag === "all" ? "Recent Recordings" : `${selectedTag.charAt(0).toUpperCase() + selectedTag.slice(1)} Recordings`}
+                    </h2>
+                    {unpinnedRecordings.map((recording) => (
+                      <RecordingCard
+                        key={recording.id}
+                        {...recording}
+                        onPlay={(id) => console.log("Play:", id)}
+                        onShare={handleShare}
+                        onDelete={handleDelete}
+                        onPin={handlePin}
+                      />
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </div>
       </div>

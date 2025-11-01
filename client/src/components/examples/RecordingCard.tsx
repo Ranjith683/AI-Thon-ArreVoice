@@ -1,6 +1,9 @@
+import { useState } from "react";
 import RecordingCard from "../RecordingCard";
 
 export default function RecordingCardExample() {
+  const [isPinned, setIsPinned] = useState(false);
+
   const mockRecording = {
     id: "1",
     title: "My thoughts on AI and creativity",
@@ -16,6 +19,7 @@ export default function RecordingCardExample() {
     ],
     duration: 125,
     isPrivate: false,
+    isPinned: isPinned,
     createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
   };
 
@@ -26,6 +30,10 @@ export default function RecordingCardExample() {
         onPlay={(id) => console.log("Play:", id)}
         onShare={(id) => console.log("Share:", id)}
         onDelete={(id) => console.log("Delete:", id)}
+        onPin={(id) => {
+          setIsPinned(!isPinned);
+          console.log("Pin toggled:", id);
+        }}
       />
     </div>
   );
