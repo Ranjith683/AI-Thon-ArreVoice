@@ -1,8 +1,9 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Calendar } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import BadgeCollection from "@/components/BadgeCollection";
 import StreakWidget from "@/components/StreakWidget";
+import ActivityCalendar from "@/components/ActivityCalendar";
 
 export default function Streaks() {
   const streak = {
@@ -19,14 +20,6 @@ export default function Streaks() {
       count: Math.random() > 0.7 ? Math.floor(Math.random() * 5) : 0,
     };
   });
-
-  const getActivityColor = (count: number) => {
-    if (count === 0) return "bg-muted";
-    if (count === 1) return "bg-primary/30";
-    if (count === 2) return "bg-primary/50";
-    if (count === 3) return "bg-primary/70";
-    return "bg-primary";
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -57,39 +50,7 @@ export default function Streaks() {
           </div>
 
           <div className="md:col-span-2">
-            <div className="bg-card rounded-lg border p-6 space-y-4">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-primary" />
-                <h2 className="text-xl font-heading font-semibold">
-                  Activity Calendar
-                </h2>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Your recording activity over the past year
-              </p>
-              <div className="overflow-x-auto">
-                <div className="inline-grid grid-cols-53 gap-1 min-w-max">
-                  {activityData.map((day, index) => (
-                    <div
-                      key={index}
-                      className={`w-3 h-3 rounded-sm ${getActivityColor(day.count)}`}
-                      title={`${day.date.toLocaleDateString()}: ${day.count} recordings`}
-                    />
-                  ))}
-                </div>
-              </div>
-              <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                <span>Less</span>
-                <div className="flex gap-1">
-                  <div className="w-3 h-3 rounded-sm bg-muted" />
-                  <div className="w-3 h-3 rounded-sm bg-primary/30" />
-                  <div className="w-3 h-3 rounded-sm bg-primary/50" />
-                  <div className="w-3 h-3 rounded-sm bg-primary/70" />
-                  <div className="w-3 h-3 rounded-sm bg-primary" />
-                </div>
-                <span>More</span>
-              </div>
-            </div>
+            <ActivityCalendar activityData={activityData} />
           </div>
         </div>
 
