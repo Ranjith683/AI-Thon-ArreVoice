@@ -138,25 +138,49 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-5xl mx-auto p-4 md:p-8 space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-heading font-bold">
-              VoiceNote
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Capture your thoughts with AI-powered transcription
-            </p>
-          </div>
-          <Button
-            size="lg"
-            onClick={() => setRecordingModalOpen(true)}
-            data-testid="button-new-recording"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            New Recording
-          </Button>
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/attached_assets/WhatsApp Image 2025-11-01 at 13.21.31_ef0b8287_1761990168735.jpg"
+            alt="Voice waveform background"
+            className="w-full h-full object-cover opacity-90"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background" />
         </div>
+        
+        <div className="relative z-10 max-w-5xl mx-auto px-4 md:px-8 py-16 md:py-24 text-center">
+          <h1 className="text-4xl md:text-6xl font-heading font-bold mb-4 text-foreground">
+            Your Voice, Your Story
+          </h1>
+          <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Record, transcribe, and understand your thoughts with AI-powered audio journaling
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              size="lg"
+              onClick={() => setRecordingModalOpen(true)}
+              className="text-base px-6 py-6"
+              data-testid="button-new-recording"
+            >
+              <Mic className="w-5 h-5 mr-2" />
+              Start Recording
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={() => {
+                document.getElementById('recordings-section')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="text-base px-6 py-6 bg-background/80 backdrop-blur"
+              data-testid="button-view-library"
+            >
+              View Library
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-5xl mx-auto p-4 md:p-8 space-y-6" id="recordings-section">
 
         <div className="grid md:grid-cols-4 gap-6">
           <div className="md:col-span-1">
