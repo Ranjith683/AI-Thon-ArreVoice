@@ -141,9 +141,9 @@ export default function Home() {
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
-            src="/attached_assets/WhatsApp Image 2025-11-01 at 13.21.31_ef0b8287_1761990168735.jpg"
+            src="./BGbanner.jpg"
             alt="Voice waveform background"
-            className="w-full h-full object-cover opacity-90"
+            className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background" />
         </div>
